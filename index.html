@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Lost &amp; Found Registry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,500;0,8..60,600;1,8..60,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <span class="orb orb-a"></span>
+    <span class="orb orb-b"></span>
+    <span class="orb orb-c"></span>
+  </div>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a href="#" class="brand">
+          <span class="brand-mark"><i data-lucide="archive-restore"></i></span>
+          <span class="brand-copy">
+            <span class="brand-name">Lost &amp; Found</span>
+            <span class="brand-tag">Campus Registry</span>
+          </span>
+        </a>
+
+        <nav class="view-switch" role="tablist" aria-label="Registry views">
+          <button type="button" class="view-switch-btn is-active" role="tab" id="tabFound" aria-selected="true" aria-controls="panelFound" data-view="found">
+            <i data-lucide="package-search"></i>
+            Found Items
+          </button>
+          <button type="button" class="view-switch-btn" role="tab" id="tabLost" aria-selected="false" aria-controls="panelLost" data-view="lost">
+            <i data-lucide="ticket"></i>
+            Lost Reports
+          </button>
+        </nav>
+
+        <div class="topbar-actions">
+          <button type="button" class="btn btn-lost" id="btnReportLost" hidden>
+            <i data-lucide="plus"></i>
+            Report Lost
+          </button>
+          <button type="button" class="btn btn-found" id="btnRegisterFound" hidden>
+            <i data-lucide="plus"></i>
+            Register Found
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="page-head">
+        <div class="page-head-text">
+          <p class="eyebrow" id="pageEyebrow">Found items registry</p>
+          <h1 id="pageTitle">Search everything turned in on campus</h1>
+          <p class="page-lead" id="heroLead">Browse items registered by finders. Add new entries so owners can locate them without visiting every desk.</p>
+        </div>
+        <div class="stats-strip" id="statsRow" aria-label="Registry statistics"></div>
+      </section>
+
+      <div id="panelFound" role="tabpanel" aria-labelledby="tabFound" class="workspace">
+        <section class="panel glass">
+          <div class="panel-toolbar">
+            <div class="search-field">
+              <i data-lucide="search" aria-hidden="true"></i>
+              <label for="searchFound" class="visually-hidden">Search found items</label>
+              <input type="search" id="searchFound" placeholder="Search by item, location, or finder..." autocomplete="off">
+            </div>
+            <div class="filter-bar">
+              <div class="filter-chip">
+                <label for="filterFoundCategory">Category</label>
+                <select id="filterFoundCategory" class="filter-category"></select>
+              </div>
+              <div class="filter-chip">
+                <label for="filterFoundStatus">Status</label>
+                <select id="filterFoundStatus">
+                  <option value="">All</option>
+                  <option value="unclaimed">Awaiting pickup</option>
+                  <option value="claimed">Returned</option>
+                </select>
+              </div>
+              <div class="filter-chip">
+                <label for="filterFoundLocation">Pickup desk</label>
+                <select id="filterFoundLocation"><option value="">All desks</option></select>
+              </div>
+              <button type="button" class="btn-text" id="btnClearFoundFilters">
+                <i data-lucide="rotate-ccw"></i>
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <div class="panel-head">
+            <h2>All found items</h2>
+            <span class="count-pill" id="foundResultCount" aria-live="polite">0 items</span>
+          </div>
+
+          <div class="card-grid" id="foundGrid" role="list"></div>
+
+          <div class="empty glass-inset" id="foundEmpty" hidden>
+            <div class="empty-visual found-theme">
+              <i data-lucide="package-open"></i>
+            </div>
+            <h3>No found items yet</h3>
+            <p>If you picked something up on campus, register it with complete details so the owner can find it here.</p>
+            <button type="button" class="btn btn-found" id="btnAddFoundEmpty">
+              <i data-lucide="plus"></i>
+              Register found item
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <div id="panelLost" role="tabpanel" aria-labelledby="tabLost" class="workspace" hidden>
+        <section class="panel glass">
+          <div class="panel-toolbar">
+            <div class="search-field">
+              <i data-lucide="search" aria-hidden="true"></i>
+              <label for="searchLost" class="visually-hidden">Search lost reports</label>
+              <input type="search" id="searchLost" placeholder="Search by item, location, or reporter..." autocomplete="off">
+            </div>
+            <div class="filter-bar">
+              <div class="filter-chip">
+                <label for="filterLostCategory">Category</label>
+                <select id="filterLostCategory" class="filter-category"></select>
+              </div>
+              <div class="filter-chip">
+                <label for="filterLostStatus">Status</label>
+                <select id="filterLostStatus">
+                  <option value="">All</option>
+                  <option value="open">Open</option>
+                  <option value="investigating">Under review</option>
+                  <option value="matched">Possible match</option>
+                  <option value="recovered">Recovered</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+              <div class="filter-chip">
+                <label for="filterLostLocation">Last seen</label>
+                <select id="filterLostLocation"><option value="">All locations</option></select>
+              </div>
+              <button type="button" class="btn-text" id="btnClearLostFilters">
+                <i data-lucide="rotate-ccw"></i>
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <div class="panel-head">
+            <h2>All lost reports</h2>
+            <span class="count-pill" id="lostResultCount" aria-live="polite">0 tickets</span>
+          </div>
+
+          <div class="card-grid" id="lostGrid" role="list"></div>
+
+          <div class="empty glass-inset" id="lostEmpty" hidden>
+            <div class="empty-visual lost-theme">
+              <i data-lucide="search"></i>
+            </div>
+            <h3>No lost reports yet</h3>
+            <p>Lost something? Open a ticket with where and when you last had it, plus how we can reach you.</p>
+            <button type="button" class="btn btn-lost" id="btnAddLostEmpty">
+              <i data-lucide="plus"></i>
+              Report lost item
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>Campus Lost &amp; Found Registry. Demo data is stored locally in your browser.</p>
+    </footer>
+  </div>
+
+  <!-- Found modal -->
+  <dialog class="dialog" id="foundModal" aria-labelledby="foundModalTitle">
+    <form id="foundForm" method="dialog" class="dialog-form found-dialog">
+      <div class="dialog-accent"></div>
+      <header class="dialog-header">
+        <div>
+          <p class="dialog-eyebrow">Finder submission</p>
+          <h2 id="foundModalTitle">Register found item</h2>
+        </div>
+        <button type="button" class="icon-btn" id="btnCloseFound" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </header>
+      <div class="dialog-body">
+        <input type="hidden" id="foundId">
+
+        <fieldset class="form-block">
+          <legend><i data-lucide="box"></i> Item details</legend>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="foundTitle">Item name <span class="req">*</span></label>
+              <input type="text" id="foundTitle" required maxlength="120" placeholder="Black Lenovo laptop in gray sleeve">
+            </div>
+            <div class="field">
+              <label for="foundCategory">Category <span class="req">*</span></label>
+              <select id="foundCategory" class="input-category" required></select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="foundDescription">Description <span class="req">*</span></label>
+            <textarea id="foundDescription" required rows="3" maxlength="500" placeholder="Color, brand, size, unique marks"></textarea>
+          </div>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="foundCondition">Condition <span class="req">*</span></label>
+              <select id="foundCondition" required>
+                <option value="excellent">Excellent</option>
+                <option value="good" selected>Good</option>
+                <option value="fair">Fair / worn</option>
+                <option value="damaged">Damaged</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="foundStatus">Status <span class="req">*</span></label>
+              <select id="foundStatus" required>
+                <option value="unclaimed">Awaiting pickup</option>
+                <option value="claimed">Returned to owner</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-block">
+          <legend><i data-lucide="map-pin"></i> Where and when</legend>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="foundLocation">Where found <span class="req">*</span></label>
+              <input type="text" id="foundLocation" required maxlength="120" placeholder="Building, floor, or area">
+            </div>
+            <div class="field">
+              <label for="foundStorage">Pickup desk <span class="req">*</span></label>
+              <input type="text" id="foundStorage" required maxlength="120" placeholder="Desk holding the item">
+            </div>
+          </div>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="foundDate">Date found <span class="req">*</span></label>
+              <input type="date" id="foundDate" required>
+            </div>
+            <div class="field">
+              <label for="foundTime">Time found</label>
+              <input type="time" id="foundTime">
+            </div>
+          </div>
+          <div class="field">
+            <label for="foundHandedTo">Left at <span class="req">*</span></label>
+            <select id="foundHandedTo" required>
+              <option value="security">Campus security</option>
+              <option value="building_desk">Building front desk</option>
+              <option value="student_union">Student union</option>
+              <option value="library">Library circulation</option>
+              <option value="other">Other official desk</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-block">
+          <legend><i data-lucide="user"></i> Finder contact</legend>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="foundFinderName">Full name <span class="req">*</span></label>
+              <input type="text" id="foundFinderName" required maxlength="80">
+            </div>
+            <div class="field">
+              <label for="foundFinderEmail">Email <span class="req">*</span></label>
+              <input type="email" id="foundFinderEmail" required maxlength="120" placeholder="you@campus.edu">
+            </div>
+          </div>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="foundFinderPhone">Phone</label>
+              <input type="tel" id="foundFinderPhone" maxlength="30">
+            </div>
+            <div class="field">
+              <label for="foundDeskContact">Desk contact <span class="req">*</span></label>
+              <input type="text" id="foundDeskContact" required maxlength="120" placeholder="Desk email or phone">
+            </div>
+          </div>
+          <div class="field">
+            <label for="foundNotes">Notes</label>
+            <textarea id="foundNotes" rows="2" maxlength="300" placeholder="How it was found, bag contents, etc."></textarea>
+          </div>
+        </fieldset>
+      </div>
+      <footer class="dialog-footer">
+        <button type="button" class="btn btn-ghost" id="btnCancelFound">Cancel</button>
+        <button type="submit" class="btn btn-found">
+          <i data-lucide="check"></i>
+          Save item
+        </button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Lost modal -->
+  <dialog class="dialog" id="lostModal" aria-labelledby="lostModalTitle">
+    <form id="lostForm" method="dialog" class="dialog-form lost-dialog">
+      <div class="dialog-accent"></div>
+      <header class="dialog-header">
+        <div>
+          <p class="dialog-eyebrow">Lost item ticket</p>
+          <h2 id="lostModalTitle">Report lost item</h2>
+        </div>
+        <button type="button" class="icon-btn" id="btnCloseLost" aria-label="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </header>
+      <div class="dialog-body">
+        <input type="hidden" id="lostId">
+
+        <fieldset class="form-block">
+          <legend><i data-lucide="search"></i> What you lost</legend>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="lostTitle">Item name <span class="req">*</span></label>
+              <input type="text" id="lostTitle" required maxlength="120" placeholder="Car keys with university lanyard">
+            </div>
+            <div class="field">
+              <label for="lostCategory">Category <span class="req">*</span></label>
+              <select id="lostCategory" class="input-category" required></select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="lostDescription">Description <span class="req">*</span></label>
+            <textarea id="lostDescription" required rows="3" maxlength="500" placeholder="Brand, color, model, engravings"></textarea>
+          </div>
+          <div class="field">
+            <label for="lostDistinctive">Distinctive features</label>
+            <textarea id="lostDistinctive" rows="2" maxlength="300" placeholder="Scratches, stickers, initials, key count"></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-block">
+          <legend><i data-lucide="map-pin"></i> When and where</legend>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="lostLocation">Last seen location <span class="req">*</span></label>
+              <input type="text" id="lostLocation" required maxlength="120">
+            </div>
+            <div class="field">
+              <label for="lostBuilding">Building</label>
+              <input type="text" id="lostBuilding" maxlength="80" placeholder="Engineering Hall">
+            </div>
+          </div>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="lostDate">Date last seen <span class="req">*</span></label>
+              <input type="date" id="lostDate" required>
+            </div>
+            <div class="field">
+              <label for="lostTime">Approximate time</label>
+              <input type="time" id="lostTime">
+            </div>
+          </div>
+          <div class="field">
+            <label for="lostStatus">Ticket status <span class="req">*</span></label>
+            <select id="lostStatus" required>
+              <option value="open" selected>Open</option>
+              <option value="investigating">Under review</option>
+              <option value="matched">Possible match found</option>
+              <option value="recovered">Item recovered</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-block">
+          <legend><i data-lucide="contact-round"></i> Your contact details</legend>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="lostReporterName">Full name <span class="req">*</span></label>
+              <input type="text" id="lostReporterName" required maxlength="80">
+            </div>
+            <div class="field">
+              <label for="lostStudentId">Student / staff ID <span class="req">*</span></label>
+              <input type="text" id="lostStudentId" required maxlength="40">
+            </div>
+          </div>
+          <div class="form-grid two">
+            <div class="field">
+              <label for="lostEmail">Email <span class="req">*</span></label>
+              <input type="email" id="lostEmail" required maxlength="120" placeholder="you@campus.edu">
+            </div>
+            <div class="field">
+              <label for="lostPhone">Phone <span class="req">*</span></label>
+              <input type="tel" id="lostPhone" required maxlength="30">
+            </div>
+          </div>
+          <div class="field">
+            <label for="lostAlternate">Alternate contact</label>
+            <input type="text" id="lostAlternate" maxlength="120" placeholder="Roommate, parent, or secondary email">
+          </div>
+          <div class="field">
+            <label for="lostNotes">Notes</label>
+            <textarea id="lostNotes" rows="2" maxlength="300" placeholder="Urgency, places already checked"></textarea>
+          </div>
+        </fieldset>
+      </div>
+      <footer class="dialog-footer">
+        <button type="button" class="btn btn-ghost" id="btnCancelLost">Cancel</button>
+        <button type="submit" class="btn btn-lost">
+          <i data-lucide="check"></i>
+          Submit report
+        </button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- View dialog -->
+  <dialog class="dialog dialog-view" id="viewModal" aria-labelledby="viewTitle">
+    <div class="dialog-accent" id="viewAccent"></div>
+    <header class="dialog-header">
+      <div>
+        <span class="type-label" id="viewTypeBadge"></span>
+        <h2 id="viewTitle">Details</h2>
+      </div>
+      <button type="button" class="icon-btn" id="btnCloseView" aria-label="Close">
+        <i data-lucide="x"></i>
+      </button>
+    </header>
+    <div class="dialog-body" id="viewBody"></div>
+    <footer class="dialog-footer split">
+      <button type="button" class="btn btn-danger-soft" id="btnDeleteRecord">
+        <i data-lucide="trash-2"></i>
+        Delete
+      </button>
+      <button type="button" class="btn btn-ghost" id="btnEditRecord">
+        <i data-lucide="pencil"></i>
+        Edit
+      </button>
+    </footer>
+  </dialog>
+
+  <!-- Confirm -->
+  <dialog class="dialog dialog-sm" id="confirmModal" aria-labelledby="confirmTitle">
+    <header class="dialog-header compact">
+      <h2 id="confirmTitle">Delete this record?</h2>
+    </header>
+    <div class="dialog-body compact">
+      <p id="confirmMessage">This action cannot be undone.</p>
+    </div>
+    <footer class="dialog-footer">
+      <button type="button" class="btn btn-ghost" id="btnCancelDelete">Cancel</button>
+      <button type="button" class="btn btn-danger" id="btnConfirmDelete">
+        <i data-lucide="trash-2"></i>
+        Delete
+      </button>
+    </footer>
+  </dialog>
+
+  <div class="toasts" id="toastContainer" aria-live="polite"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
